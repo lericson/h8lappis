@@ -2,11 +2,12 @@
 import os
 import sys
 import shelve
-import jinja2
+import subprocess
 from datetime import datetime, timedelta
 from contextlib import closing
-from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
+
+import jinja2
 
 
 proj_path = os.path.dirname(__file__)
@@ -45,20 +46,31 @@ def render_notification(new_objs):
     return tmpl.render({'objects': new_objs})
 
 
-def print_email(new_objs):
-    #msg = MIMEMultipart()
-    msg= MIMEText(render_notification(new_objs), 'html', 'utf-8')
+def format_email(new_objs):
+    msg = MIMEText(render_notification(new_objs), 'html', 'utf-8')
     msg['Subject'] = '#h8lappis: {} nya objekt'.format(len(new_objs))
-    msg['To'] = 'Ludvig Ericson <ludvig@lericson.se>, Marie Kindblom <mariekindblom@hotmail.com>'
+    msg['To'] = ('Ludvig Ericson <ludvig@lericson.se>, '
+                 'Marie Kindblom <mariekindblom@hotmail.com>')
     msg['From'] = 'h8lappis <h8lappis@lericson.se>'
-    sys.stdout.write(msg.as_string())
+    return msg.as_string()
+
+
+def sendmail(data, from_='h8lappis@lericson.se'):
+    p = subprocess.Popen(['sendmail', '-t', '-f', from_],
+                         stdin=subprocess.PIPE,
+                         stdout=sys.stdout,
+                         stderr=sys.stderr)
+    p.stdin.write(data.encode('utf-8'))
+    p.stdin.close()
+    if p.wait():
+        raise RuntimeError('blah')
 
 
 def main():
     with closing(connect_db()) as db:
         new = list(iter_new(db))
         if new:
-            print_email(new)
+            sendmail(format_email(new))
 
 
 if __name__ == "__main__":
