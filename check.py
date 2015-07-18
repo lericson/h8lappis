@@ -56,7 +56,7 @@ def format_email(new_objs):
 
 
 def sendmail(data, from_='h8lappis@lericson.se'):
-    p = subprocess.Popen(['sendmail', '-t', '-f', from_],
+    p = subprocess.Popen(['/usr/sbin/sendmail', '-t', '-f', from_],
                          stdin=subprocess.PIPE,
                          stdout=sys.stdout,
                          stderr=sys.stderr)
