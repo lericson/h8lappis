@@ -13,6 +13,10 @@ import jinja2
 proj_path = os.path.dirname(__file__)
 db_path = os.path.join(proj_path, 'db.shelve')
 
+recipients = ('Ludvig Ericson <ludvig@lericson.se>',
+              'Marie Kindblom <mariekindblom@hotmail.com>',
+              'Aron Strandberg <aron@aronstrandberg.com>')
+
 
 def connect_db():
     return shelve.open(db_path)
@@ -49,9 +53,8 @@ def render_notification(new_objs):
 def format_email(new_objs):
     msg = MIMEText(render_notification(new_objs), 'html', 'utf-8')
     msg['Subject'] = '#h8lappis: {} nya objekt'.format(len(new_objs))
-    msg['To'] = ('Ludvig Ericson <ludvig@lericson.se>, '
-                 'Marie Kindblom <mariekindblom@hotmail.com>')
     msg['From'] = 'h8lappis <h8lappis@lericson.se>'
+    msg['To'] = ', '.join(recipients)
     return msg.as_string()
 
 
