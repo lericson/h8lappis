@@ -62,7 +62,11 @@
 
         <h2><a href="{{ obj.permalink }}">{{ obj.address }}, {{ obj.district }}</a></h2>
 
-        <p>{{ obj.rooms }} rum, {{ obj.area }} kvm på våning {{ obj.floor }} &mdash; {{ '{:,d}'.format(obj.rent) }} kr/mån
+        <p>
+          {% if obj.rooms %}{{ obj.rooms }} rum, {%endif %}
+          {% if obj.area %}{{ obj.area }} kvm {% endif %}
+          {% if obj.floor %}på våning {{ obj.floor }} {% endif %}
+          {% if obj.rent %}&mdash; {{ '{:,d}'.format(obj.rent) }} kr/mån{% endif %}
         <p>Utgår {{ obj.expires }} {% if obj.expires is soon %}<strong>(obs: snart)</strong>{% endif %}
            {% for label in obj.labels if label != 'student' %}<code>{{ label }}</code> {% endfor %}
       </article>
